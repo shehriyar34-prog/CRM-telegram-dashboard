@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRM & Telegram Bot Hub</title>
+  <!-- Google Fonts & Modern Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <!-- App Container -->
+  <div class="app-layout">
+    <!-- Top Header -->
+    <header class="navbar">
+      <div class="nav-brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>SMS CRM <span>Telegram Hub</span></h1>
+          <p class="subtitle">Real-time SMS Forwarder & Analytics Engine</p>
+        </div>
+      </div>
+
+      <div class="nav-controls">
+        <div class="service-pill" id="serviceStatusPill">
+          <span class="status-dot"></span>
+          <span class="status-label">CHECKING...</span>
+        </div>
+
+        <div class="control-actions">
+          <button id="btnStart" class="btn btn-start" title="Start Service">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Start</span>
+          </button>
+          <button id="btnStop" class="btn btn-stop" title="Stop Service">
+            <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+            <span>Stop</span>
+          </button>
+          <button id="btnRestart" class="btn btn-restart" title="Restart Service">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+            <span>Restart</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Overview</span>
+      </button>
+      <button class="tab-btn" data-tab="logs">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        <span>Live Logs</span>
+        <span class="badge" id="logsCountBadge">0</span>
+      </button>
+      <button class="tab-btn" data-tab="messages">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Forwarded SMS</span>
+      </button>
+      <button class="tab-btn" data-tab="report">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Health Report</span>
+      </button>
+      <button class="tab-btn" data-tab="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Configuration</span>
+      </button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+      <!-- TAB 1: OVERVIEW -->
+      <section id="tab-overview" class="tab-pane active">
+        <!-- 4 Metric Cards Grid -->
+        <div class="metrics-grid">
+          <!-- Card 1: Telegram Status -->
+          <div class="card status-card">
+            <div class="card-header">
+              <div class="card-icon tg-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .37z"/>
+                </svg>
+              </div>
+              <div>
+                <span class="card-title">Telegram Bot</span>
+                <span class="card-subtitle" id="tgTargetChat">Chat: Not configured</span>
+              </div>
+              <span class="status-tag status-unknown" id="tgStatusBadge">CHECKING</span>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="label">Bot Username</span>
+                <span class="value" id="tgBotUsername">--</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Last Forwarded</span>
+                <span class="value" id="tgLastSms">None</span>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-outline btn-sm" id="btnTestTelegram">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                <span>Test Telegram Connection</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: CRM Panel Status -->
+          <div class="card status-card">
+            <div class="card-header">
+              <div class="card-icon crm-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+                  <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+                  <line x1="6" y1="6" x2="6.01" y2="6"/>
+                  <line x1="6" y1="18" x2="6.01" y2="18"/>
+                </svg>
+              </div>
+              <div>
+                <span class="card-title">CRM SMS Panel</span>
+                <span class="card-subtitle" id="crmBaseUrl">https://imssms.org/api/v1</span>
+              </div>
+              <span class="status-tag status-unknown" id="crmStatusBadge">CHECKING</span>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="label">Clients Loaded</span>
+                <span class="value" id="crmClientsCount">0</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Assigned Numbers</span>
+                <span class="value" id="crmNumbersCount">0</span>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-outline btn-sm" id="btnTestCRM">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 11.08V8l-6-6H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h6"/><path d="M14 3v5h5M18 21l3-3m0 0l-3-3m3 3h-8"/></svg>
+                <span>Test CRM Panel API</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: Traffic & Stats -->
+          <div class="card metric-stat-card">
+            <div class="card-header">
+              <div class="card-icon stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+              </div>
+              <div>
+                <span class="card-title">SMS Activity</span>
+                <span class="card-subtitle">Current session volume</span>
+              </div>
+            </div>
+            <div class="stat-dual">
+              <div class="stat-item">
+                <span class="stat-number text-emerald" id="statForwarded">0</span>
+                <span class="stat-desc">Forwarded to Telegram</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-number text-cyan" id="statDetected">0</span>
+                <span class="stat-desc">Detected from Panel</span>
+              </div>
+            </div>
+            <div class="card-footer stat-sub">
+              <span>Seen In Memory: <strong id="statSeen">0</strong></span>
+              <span>Errors: <strong class="text-rose" id="statErrors">0</strong></span>
+            </div>
+          </div>
+
+          <!-- Card 4: Service Engine Health -->
+          <div class="card metric-stat-card">
+            <div class="card-header">
+              <div class="card-icon engine-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </div>
+              <div>
+                <span class="card-title">Engine Uptime</span>
+                <span class="card-subtitle">Loop cycle monitor</span>
+              </div>
+            </div>
+            <div class="stat-center">
+              <span class="uptime-clock" id="statUptime">00:00:00</span>
+              <span class="stat-desc" id="statStartedAt">Started: Not running</span>
+            </div>
+            <div class="card-footer stat-sub">
+              <span>Last Poll: <strong id="statLastPoll">Never</strong></span>
+              <span>Daily Report: <strong id="statDailyReport">Off</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Split Grid: Recent Forwarded SMS & Quick Live Logs -->
+        <div class="dashboard-split">
+          <!-- Left: Recent SMS Feed -->
+          <div class="panel-box">
+            <div class="panel-box-header">
+              <div class="panel-box-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <h3>Recent Forwarded SMS</h3>
+              </div>
+              <button class="btn btn-ghost btn-xs" onclick="switchTab('messages')">View All →</button>
+            </div>
+            <div class="sms-feed" id="overviewSmsFeed">
+              <div class="empty-state">
+                <p>No SMS forwarded yet in this session.</p>
+                <small>New incoming SMS from the CRM panel will appear here automatically.</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Live Activity Log Stream -->
+          <div class="panel-box">
+            <div class="panel-box-header">
+              <div class="panel-box-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                <h3>Live Activity Stream</h3>
+              </div>
+              <button class="btn btn-ghost btn-xs" onclick="switchTab('logs')">Full Console →</button>
+            </div>
+            <div class="mini-terminal" id="overviewMiniLogs">
+              <!-- Logs injected dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: LIVE LOGS CONSOLE -->
+      <section id="tab-logs" class="tab-pane">
+        <div class="terminal-container">
+          <div class="terminal-toolbar">
+            <div class="toolbar-left">
+              <div class="filter-group">
+                <label>Level:</label>
+                <select id="logFilterLevel" class="select-sm">
+                  <option value="">ALL</option>
+                  <option value="INFO">INFO</option>
+                  <option value="SUCCESS">SUCCESS</option>
+                  <option value="WARNING">WARNING</option>
+                  <option value="ERROR">ERROR</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Source:</label>
+                <select id="logFilterSource" class="select-sm">
+                  <option value="">ALL</option>
+                  <option value="SERVICE">SERVICE</option>
+                  <option value="TELEGRAM">TELEGRAM</option>
+                  <option value="CRM">CRM</option>
+                  <option value="REPORT">REPORT</option>
+                  <option value="SYSTEM">SYSTEM</option>
+                </select>
+              </div>
+              <input type="text" id="logSearchInput" placeholder="Search logs..." class="input-search">
+            </div>
+
+            <div class="toolbar-right">
+              <label class="toggle-label">
+                <input type="checkbox" id="logAutoScroll" checked>
+                <span>Auto-Scroll</span>
+              </label>
+              <button id="btnClearLogs" class="btn btn-secondary btn-sm">Clear</button>
+              <button id="btnDownloadLogs" class="btn btn-secondary btn-sm">Download</button>
+            </div>
+          </div>
+
+          <!-- Terminal Content Viewport -->
+          <div class="terminal-viewport" id="fullTerminal">
+            <!-- Full logs injected here -->
+          </div>
+
+          <div class="terminal-statusbar">
+            <span id="logStatusText">Showing 0 entries</span>
+            <span>Polling frequency: 2s</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: FORWARDED SMS -->
+      <section id="tab-messages" class="tab-pane">
+        <div class="panel-box">
+          <div class="panel-box-header">
+            <div class="panel-box-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <h3>Forwarded SMS Messages History</h3>
+            </div>
+            <div class="header-actions">
+              <input type="text" id="smsSearchInput" placeholder="Filter by phone, CLI or code..." class="input-search">
+            </div>
+          </div>
+
+          <div class="sms-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Time (PKT)</th>
+                  <th>Service (CLI)</th>
+                  <th>Client</th>
+                  <th>Number</th>
+                  <th>Code</th>
+                  <th>Range</th>
+                  <th>SMS Content Preview</th>
+                </tr>
+              </thead>
+              <tbody id="fullSmsTableBody">
+                <tr>
+                  <td colspan="7" class="text-center text-muted">No messages forwarded yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: NUMBER HEALTH REPORT -->
+      <section id="tab-report" class="tab-pane">
+        <div class="report-container">
+          <div class="report-sidebar">
+            <div class="panel-box">
+              <div class="panel-box-header">
+                <h3>Generate Health Report</h3>
+              </div>
+              <div class="report-controls-form">
+                <p class="text-muted text-sm">
+                  Computes message throughput, paid vs unpaid breakdown, payout totals, active silent numbers, and CLI service distribution.
+                </p>
+
+                <div class="form-group">
+                  <label>Time Period (Days):</label>
+                  <div class="day-pills">
+                    <button class="pill-btn active" data-days="1">1 Day</button>
+                    <button class="pill-btn" data-days="3">3 Days</button>
+                    <button class="pill-btn" data-days="7">7 Days</button>
+                    <button class="pill-btn" data-days="14">14 Days</button>
+                    <button class="pill-btn" data-days="30">30 Days</button>
+                  </div>
+                  <input type="number" id="customDaysInput" min="1" max="30" value="1" class="input-control" placeholder="Or enter days (1-30)">
+                </div>
+
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="sendReportToTelegram">
+                    <span>Forward report directly to Telegram channel</span>
+                  </label>
+                </div>
+
+                <button id="btnGenerateReport" class="btn btn-primary btn-block">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                  <span>Build Report</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="report-main">
+            <div class="panel-box">
+              <div class="panel-box-header">
+                <div class="panel-box-title">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                  <h3>Report Output Preview</h3>
+                </div>
+                <div class="header-actions" id="reportActions" style="display: none;">
+                  <button class="btn btn-secondary btn-sm" id="btnCopyReport">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    <span>Copy Text</span>
+                  </button>
+                </div>
+              </div>
+              <div class="report-view" id="reportPreviewArea">
+                <div class="empty-state">
+                  <p>No report built yet.</p>
+                  <small>Select the number of days on the left and click "Build Report" to inspect number performance.</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: CONFIGURATION SETTINGS -->
+      <section id="tab-settings" class="tab-pane">
+        <div class="settings-grid">
+          <!-- Column 1: API & Security -->
+          <div class="panel-box">
+            <div class="panel-box-header">
+              <div class="panel-box-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <h3>API Credentials & Tokens</h3>
+              </div>
+            </div>
+            <div class="panel-box-body">
+              <div class="form-group">
+                <div class="field-header">
+                  <label for="cfgBotToken">Telegram Bot Token</label>
+                  <button type="button" class="btn-text" onclick="toggleTokenMask('cfgBotToken')">Toggle Mask</button>
+                </div>
+                <input type="password" id="cfgBotToken" class="input-control mono" placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz">
+                <small class="field-help">Bot token provided by BotFather on Telegram.</small>
+              </div>
+
+              <div class="form-group">
+                <label for="cfgChatId">Telegram Channel / Chat ID</label>
+                <input type="text" id="cfgChatId" class="input-control mono" placeholder="-1001234567890 or @channel_name">
+                <small class="field-help">Channel ID where messages and reports are delivered. Bot must be an admin.</small>
+              </div>
+
+              <div class="form-divider"></div>
+
+              <div class="form-group">
+                <div class="field-header">
+                  <label for="cfgPanelToken">SMS CRM Panel API Token</label>
+                  <button type="button" class="btn-text" onclick="toggleTokenMask('cfgPanelToken')">Toggle Mask</button>
+                </div>
+                <input type="password" id="cfgPanelToken" class="input-control mono" placeholder="Bearer API token from SMS portal">
+                <small class="field-help">API token for imssms.org portal.</small>
+              </div>
+
+              <div class="form-group">
+                <label for="cfgPanelBase">CRM Panel Base URL</label>
+                <input type="text" id="cfgPanelBase" class="input-control" value="https://imssms.org/api/v1">
+              </div>
+            </div>
+          </div>
+
+          <!-- Column 2: Polling, Intervals & Reports -->
+          <div class="panel-box">
+            <div class="panel-box-header">
+              <div class="panel-box-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <h3>Polling & Scheduling Intervals</h3>
+              </div>
+            </div>
+            <div class="panel-box-body">
+              <div class="form-row">
+                <div class="form-group col-half">
+                  <label for="cfgPollSeconds">SMS Poll Interval (sec)</label>
+                  <input type="number" id="cfgPollSeconds" min="2" max="60" class="input-control" value="5">
+                  <small class="field-help">Keep at 2s or higher to respect rate limits.</small>
+                </div>
+                <div class="form-group col-half">
+                  <label for="cfgClientRefresh">Client Refresh (sec)</label>
+                  <input type="number" id="cfgClientRefresh" min="30" max="3600" class="input-control" value="300">
+                  <small class="field-help">Frequency of checking number mappings.</small>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-half">
+                  <label for="cfgMessagesPerPoll">Messages Per Poll</label>
+                  <input type="number" id="cfgMessagesPerPoll" min="5" max="100" class="input-control" value="50">
+                </div>
+                <div class="form-group col-half">
+                  <label for="cfgDailyHour">Daily Report Hour (PKT)</label>
+                  <input type="number" id="cfgDailyHour" min="0" max="23" class="input-control" placeholder="e.g. 9 (Leave empty for off)">
+                  <small class="field-help">Hour 0-23 PKT (UTC+5).</small>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group col-half">
+                  <label for="cfgReportDefaultDays">Default Report Days</label>
+                  <input type="number" id="cfgReportDefaultDays" min="1" max="30" class="input-control" value="1">
+                </div>
+                <div class="form-group col-half">
+                  <label for="cfgReportMaxDays">Max Report Days</label>
+                  <input type="number" id="cfgReportMaxDays" min="1" max="30" class="input-control" value="30">
+                </div>
+              </div>
+
+              <div class="form-divider"></div>
+
+              <div class="form-group">
+                <label>Manual Number Overrides (<code>CLIENT_BY_NUMBER</code> JSON)</label>
+                <textarea id="cfgClientByNumber" class="input-control mono" rows="4" placeholder='{ "59160264965": "Client A" }'></textarea>
+                <small class="field-help">Optional phone-to-client overrides. Checked before API client mappings.</small>
+              </div>
+
+              <div class="settings-actions">
+                <button id="btnSaveSettings" class="btn btn-primary">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                  <span>Save Configuration</span>
+                </button>
+                <button id="btnSaveAndRestart" class="btn btn-restart">
+                  <span>Save & Restart Service</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: crm-telegram-dashboard
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python run.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: CHAT_ID
+        sync: false
+      - key: PANEL_TOKEN
+        sync: false
+      - key: PANEL_BASE
+        value: https://imssms.org/api/v1
+      - key: POLL_SECONDS
+        value: 6
+      - key: CLIENT_REFRESH_SECONDS
+        value: 300
+      - key: AUTO_START_SERVICE
+        value: true
